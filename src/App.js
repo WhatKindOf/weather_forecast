@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import Weather from "./Weather";
 ///////////////// AppBar를 위한 import문 ///////////////////
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -80,7 +81,8 @@ class App extends React.Component {
       tempMax: "",
       humidity: "",
       windSpeed: ""
-    }
+    },
+    show: false
   };
 
   getDate = () => {
@@ -122,7 +124,22 @@ class App extends React.Component {
   getCurrentLocationWeather = () => {
     navigator.geolocation.getCurrentPosition(
       position => {
-        this.getWeather(position.coords.latitude, position.coords.longitude);
+        this.getWeather(position.coords.latitude, position.coords.longitude)
+          .then(res =>
+            this.setState({
+              weatherInfo: {
+                cityName: res.name,
+                weather: res.weather[0].main,
+                temp: Math.ceil(res.main.temp - 273.15) + "℃",
+                tempMin: Math.ceil(res.main.temp_min - 273.15) + "℃",
+                tempMax: Math.ceil(res.main.temp_max - 273.15) + "℃",
+                humidity: res.main.humidity + "%",
+                windSpeed: res.wind.speed + "m/s"
+              },
+              show: true
+            })
+          )
+          .catch(err => console.log(err));
       },
       error => {
         console.log(error);
@@ -130,7 +147,7 @@ class App extends React.Component {
     );
   };
 
-  getWeather = (lat, lon) => {
+  getWeather = async (lat, lon) => {
     const api_url =
       "http://api.openweathermap.org/data/2.5/weather?lat=" +
       lat +
@@ -138,21 +155,10 @@ class App extends React.Component {
       lon +
       "&appid=" +
       API_KEY;
-    fetch(api_url)
-      .then(response => response.json())
-      .then(json => {
-        this.setState({
-          weatherInfo: {
-            cityName: json.name,
-            weather: json.weather[0].main,
-            temp: Math.ceil(json.main.temp - 273.15) + "℃",
-            tempMin: Math.ceil(json.main.temp_min - 273.15) + "℃",
-            tempMax: Math.ceil(json.main.temp_max - 273.15) + "℃",
-            humidity: json.main.humidity + "%",
-            windSpeed: json.wind.speed + "m/s"
-          }
-        });
-      });
+
+    const response = await fetch(api_url);
+    const body = await response.json();
+    return body;
   };
 
   componentDidMount() {
@@ -184,184 +190,11 @@ class App extends React.Component {
             </HereButton>
           </Toolbar>
         </AppBar>
-        <Lower>
-          <CurrentLocation>
-            <Location>{this.state.weatherInfo.cityName}</Location>
-            <CurrentDate>
-              {`${this.state.year} 
-            ${this.state.month}
-            ${this.state.day}
-            ${this.state.dayOfWeek}`}
-            </CurrentDate>
-            <CurrentTime>
-              {`${this.state.hour}
-            ${this.state.minute}
-            ${this.state.second}`}
-            </CurrentTime>
-          </CurrentLocation>
-          <CurrentWeather>
-            <WeatherImage>
-              <Img src={require("./images/sunny.png")} alt="sun" />
-              <WhatIsWeather>{this.state.weatherInfo.weather}</WhatIsWeather>
-            </WeatherImage>
-            <WeatherInfo>
-              <TemperatureInfo>
-                <CurrentTemperature>
-                  {this.state.weatherInfo.temp}
-                </CurrentTemperature>
-                <TemperatureMinMax>
-                  <MinTemperature>
-                    {this.state.weatherInfo.tempMin}
-                  </MinTemperature>
-                  &nbsp;<Slash>/</Slash>&nbsp;
-                  <MaxTemperature>
-                    {this.state.weatherInfo.tempMax}
-                  </MaxTemperature>
-                </TemperatureMinMax>
-              </TemperatureInfo>
-              <HumidityWind>
-                <HumWind>
-                  습도 : {this.state.weatherInfo.humidity} / 풍속 :{" "}
-                  {this.state.weatherInfo.windSpeed}
-                </HumWind>
-              </HumidityWind>
-            </WeatherInfo>
-          </CurrentWeather>
-        </Lower>
+        {this.state.show === true ? <Weather data={this.state} /> : ""}
       </div>
     );
   }
 }
-
-const Lower = styled.div`
-  position: absolute;
-  height: 90%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  padding: 15px 0px;
-`;
-
-const CurrentLocation = styled.div`
-  height: 20%;
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-`;
-
-const CurrentDate = styled.p`
-  font-size: 2.5vmin;
-  color: white;
-  margin: 0px;
-`;
-
-const CurrentTime = styled.p`
-  font-size: 2.5vmin;
-  color: white;
-  margin-top: 0px;
-`;
-
-const Location = styled.p`
-  font-size: 7vmin;
-  font-weight: bold;
-  color: white;
-  margin: 25px 0px 7px 0px;
-`;
-
-const CurrentWeather = styled.div`
-  height: 70%;
-  width: 90%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const WeatherImage = styled.div`
-  height: 70%;
-  width: 45%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const WhatIsWeather = styled.p`
-  font-weight: bold;
-  font-size: 4vmin;
-`;
-
-const Img = styled.img`
-  max-width: 100%;
-  max-height: 100%;
-`;
-
-const WeatherInfo = styled.div`
-  height: 100%;
-  width: 50%;
-  margin-left: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-
-const TemperatureInfo = styled.div`
-  height: 60%;
-  width: 90%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  }
-`;
-
-const CurrentTemperature = styled.p`
-  font-size: 17vmin;
-  color: white;
-  font-weight: bold;
-  margin: 10px 0px;
-`;
-
-const TemperatureMinMax = styled.div`
-  margin: 0px;
-`;
-
-const MinTemperature = styled.span`
-  color: blue;
-  font-size: 4vmin;
-  margin-right: 10px;
-  font-weight: bold;
-`;
-
-const MaxTemperature = styled.span`
-  color: red;
-  font-size: 4vmin;
-  margin-left: 10px;
-  font-weight: bold;
-`;
-
-const Slash = styled.span`
-  color: black;
-  font-size: 4vmin;
-`;
-
-const HumidityWind = styled.div`
-  height: 40%;
-  width: 90%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const HumWind = styled.p`
-  color: white;
-  font-size: 3vmin;
-  font-weight: bold;
-`;
 
 const HereButton = styled.button`
   background-color: transparent;
