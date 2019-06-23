@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import Weather from "./Weather";
 ///////////////// AppBar를 위한 import문 ///////////////////
 import AppBar from "@material-ui/core/AppBar";
@@ -161,6 +161,46 @@ class App extends React.Component {
     return body;
   };
 
+  getCityWeather = async e => {
+    const targetCity = e.target.value;
+    const api_url =
+      "http://api.openweathermap.org/data/2.5/weather?q=" +
+      targetCity +
+      "&appid=" +
+      API_KEY;
+    const response = await fetch(api_url);
+    const body = await response.json();
+    if (body.cod === 200) {
+      this.setState({
+        weatherInfo: {
+          cityName: body.name,
+          weather: body.weather[0].main,
+          temp: Math.ceil(body.main.temp - 273.15) + "℃",
+          tempMin: Math.ceil(body.main.temp_min - 273.15) + "℃",
+          tempMax: Math.ceil(body.main.temp_max - 273.15) + "℃",
+          humidity: body.main.humidity + "%",
+          windSpeed: body.wind.speed + "m/s"
+        },
+        show: true
+      });
+    }
+  };
+
+  init = () => {
+    this.setState({
+      weatherInfo: {
+        cityName: "",
+        weather: "",
+        temp: "",
+        tempMin: "",
+        tempMax: "",
+        humidity: "",
+        windSpeed: ""
+      },
+      show: false
+    });
+  };
+
   componentDidMount() {
     this.getDate();
     setInterval(() => this.getTime(), 1000);
@@ -172,6 +212,9 @@ class App extends React.Component {
       <div className={classes.root}>
         <AppBar className={classes.appBar} position="static">
           <Toolbar className={classes.toolBar}>
+            <HomeButton onClick={this.init}>
+              <img src={require("./images/Home.png")} alt="HomeButton" />
+            </HomeButton>
             <div className={classes.search}>
               <div className={classes.searchIcon}>
                 <SearchIcon />
@@ -183,11 +226,19 @@ class App extends React.Component {
                   input: classes.inputInput
                 }}
                 inputProps={{ "aria-label": "Search" }}
+                onChange={this.getCityWeather}
               />
             </div>
             <HereButton onClick={this.getCurrentLocationWeather}>
               <ButtonImage src={require("./images/map.png")} />
             </HereButton>
+            <Notice>
+              <img
+                src={require("./images/pointing-left.png")}
+                alt="pointing-left"
+              />
+              <NoticeSentence>현재 위치 날씨</NoticeSentence>
+            </Notice>
           </Toolbar>
         </AppBar>
         {this.state.show === true ? <Weather data={this.state} /> : ""}
@@ -196,15 +247,51 @@ class App extends React.Component {
   }
 }
 
+const HomeButton = styled.button`
+  background-color: transparent;
+  margin-right: 15px;
+  border: none;
+  cursor: pointer;
+`;
+
 const HereButton = styled.button`
   background-color: transparent;
   margin-left: 20px;
+  margin-right: 25px;
   border: none;
+  cursor: pointer;
 `;
 
 const ButtonImage = styled.img`
   width: 32px;
   height: 32px;
+`;
+
+const move = keyframes`
+  0%{
+    transform:translateX(0px);
+  }
+  50%{
+    transform:translateX(-6px);
+  }
+  100%{
+    transform:translateX(0px);
+  }
+`;
+
+const Notice = styled.div`
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: ${move} 1s linear infinite;
+`;
+
+const NoticeSentence = styled.p`
+  font-weight: bold;
+  color: white;
+  margin-left: 8px;
+  font-size: 2vmin;
 `;
 
 export default withStyles(styles)(App);

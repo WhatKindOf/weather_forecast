@@ -166,6 +166,7 @@ const MaxTemperature = styled.span`
 const Slash = styled.span`
   color: black;
   font-size: 4vmin;
+  font-weight: bold;
 `;
 
 const HumidityWind = styled.div`
