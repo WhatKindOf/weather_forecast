@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import Weather from "./Weather";
 ///////////////// AppBar를 위한 import문 ///////////////////
 import AppBar from "@material-ui/core/AppBar";
@@ -82,7 +82,8 @@ class App extends React.Component {
       humidity: "",
       windSpeed: ""
     },
-    show: false
+    show: false,
+    showQuestion: "none"
   };
 
   getDate = () => {
@@ -201,6 +202,18 @@ class App extends React.Component {
     });
   };
 
+  blockQuestion = () => {
+    this.setState({
+      showQuestion: "block"
+    });
+  };
+
+  noneQuestion = () => {
+    this.setState({
+      showQuestion: "none"
+    });
+  };
+
   componentDidMount() {
     this.getDate();
     setInterval(() => this.getTime(), 1000);
@@ -215,6 +228,23 @@ class App extends React.Component {
             <HomeButton onClick={this.init}>
               <img src={require("./images/Home.png")} alt="HomeButton" />
             </HomeButton>
+            <div>
+              <img
+                src={require("./images/question.png")}
+                alt="question_mark"
+                onMouseEnter={this.blockQuestion}
+                onMouseOut={this.noneQuestion}
+              />
+              <UpArrow display={this.state.showQuestion} />
+              <Question display={this.state.showQuestion}>
+                <QuestionSentence>
+                  특정 도시를 검색할 수 있습니다. <br />
+                  단, 영문자로 검색하셔야 합니다.
+                  <br />
+                  (예시 : 대구 -> daegu)
+                </QuestionSentence>
+              </Question>
+            </div>
             <div className={classes.search}>
               <div className={classes.searchIcon}>
                 <SearchIcon />
@@ -292,6 +322,44 @@ const NoticeSentence = styled.p`
   color: white;
   margin-left: 8px;
   font-size: 2vmin;
+`;
+
+const UpArrow = styled.div`
+  margin-left: 9px;
+  margin-top: 4px;
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 9px solid white;
+  ${props => {
+    if (props.display === "none") {
+      return css`
+        display: ${props.display};
+      `;
+    }
+  }}
+`;
+
+const Question = styled.div`
+  border: 3px solid #fff;
+  position: absolute;
+  margin-top: 13px;
+  margin-left: -30px;
+  border-radius: 5px;
+  padding: 9px;
+  ${props => {
+    if (props.display === "none") {
+      return css`
+        display: ${props.display};
+      `;
+    }
+  }}
+`;
+
+const QuestionSentence = styled.span`
+  font-weight: bold;
 `;
 
 export default withStyles(styles)(App);
