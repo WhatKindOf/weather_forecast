@@ -2,50 +2,104 @@ import React from "react";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 
-function Weather({ data }) {
-  return (
-    <Lower>
-      <CurrentLocation>
-        <Location>{data.weatherInfo.cityName}</Location>
-        <CurrentDate>
-          {`${data.year} 
-            ${data.month}
-            ${data.day}
-            ${data.dayOfWeek}`}
-        </CurrentDate>
-        <CurrentTime>
-          {`${data.hour}
-            ${data.minute}
-            ${data.second}`}
-        </CurrentTime>
-      </CurrentLocation>
-      <CurrentWeather>
-        <WeatherImage>
-          <Img
-            src={require("./images/" + data.weatherInfo.weather + ".png")}
-            alt="sun"
-          />
-          <WhatIsWeather>{data.weatherInfo.weather}</WhatIsWeather>
-        </WeatherImage>
-        <WeatherInfo>
-          <TemperatureInfo>
-            <CurrentTemperature>{data.weatherInfo.temp}</CurrentTemperature>
-            <TemperatureMinMax>
-              <MinTemperature>{data.weatherInfo.tempMin}</MinTemperature>
-              &nbsp;<Slash>/</Slash>&nbsp;
-              <MaxTemperature>{data.weatherInfo.tempMax}</MaxTemperature>
-            </TemperatureMinMax>
-          </TemperatureInfo>
-          <HumidityWind>
-            <HumWind>
-              습도 : {data.weatherInfo.humidity} / 풍속 :{" "}
-              {data.weatherInfo.windSpeed}
-            </HumWind>
-          </HumidityWind>
-        </WeatherInfo>
-      </CurrentWeather>
-    </Lower>
-  );
+class Weather extends React.Component {
+  state = {
+    year: "",
+    month: "",
+    day: "",
+    dayOfWeek: "",
+    hour: "",
+    minute: "",
+    second: ""
+  };
+
+  getDate = () => {
+    const week = [
+      "일요일",
+      "월요일",
+      "화요일",
+      "수요일",
+      "목요일",
+      "금요일",
+      "토요일"
+    ];
+    const date = new Date();
+
+    this.setState({
+      year: date.getFullYear() + "년",
+      month: date.getMonth() + 1 + "월",
+      day: date.getDate() + "일",
+      dayOfWeek: week[date.getDay()]
+    });
+    this.getTime();
+  };
+
+  getTime = () => {
+    const date = new Date();
+
+    this.setState({
+      hour:
+        (date.getHours() < 10 ? "0" + date.getHours() : date.getHours()) + "시",
+      minute:
+        (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()) +
+        "분",
+      second:
+        (date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds()) +
+        "초"
+    });
+  };
+
+  componentDidMount() {
+    this.getDate();
+    setInterval(() => this.getTime(), 1000);
+  }
+
+  render() {
+    const data = this.props.data;
+    return (
+      <Lower>
+        <CurrentLocation>
+          <Location>{data.weatherInfo.cityName}</Location>
+          <CurrentDate>
+            {`${this.state.year} 
+            ${this.state.month}
+            ${this.state.day}
+            ${this.state.dayOfWeek}`}
+          </CurrentDate>
+          <CurrentTime>
+            {`${this.state.hour}
+            ${this.state.minute}
+            ${this.state.second}`}
+          </CurrentTime>
+        </CurrentLocation>
+        <CurrentWeather>
+          <WeatherImage>
+            <Img
+              src={require("./images/" + data.weatherInfo.weather + ".png")}
+              alt="sun"
+            />
+            <WhatIsWeather>{data.weatherInfo.weather}</WhatIsWeather>
+          </WeatherImage>
+          <WeatherInfo>
+            <TemperatureInfo>
+              <CurrentTemperature>{data.weatherInfo.temp}</CurrentTemperature>
+              <TemperatureMinMax>
+                <MinTemperature>{data.weatherInfo.tempMin}</MinTemperature>
+                &nbsp;<Slash>/</Slash>&nbsp;
+                <MaxTemperature>{data.weatherInfo.tempMax}</MaxTemperature>
+              </TemperatureMinMax>
+            </TemperatureInfo>
+            <HumidityWind>
+              <HumWind>
+                습도 : {data.weatherInfo.humidity} / 풍속 :
+                {data.weatherInfo.windSpeed}
+              </HumWind>
+            </HumidityWind>
+          </WeatherInfo>
+        </CurrentWeather>
+      </Lower>
+    );
+  }
 }
 
 Weather.propTypes = {
