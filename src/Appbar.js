@@ -174,6 +174,7 @@ class Appbar extends React.Component {
 
   render() {
     const { classes } = this.props;
+    const { count, todoList, clickCheck, clickDelete, inputTodo } = this.props;
     return (
       <div className={classes.root}>
         <AppBar className={classes.appBar} position="static">
@@ -222,10 +223,19 @@ class Appbar extends React.Component {
               />
               <NoticeSentence>현재 위치 날씨</NoticeSentence>
             </Notice>
-            <Bell />
+            <Bell count={count} />
           </Toolbar>
         </AppBar>
-        {this.state.show === true ? <Weather data={this.state} /> : <Todo />}
+        {this.state.show === true ? (
+          <Weather data={this.state} />
+        ) : (
+          <Todo
+            todoList={todoList}
+            clickCheck={clickCheck}
+            clickDelete={clickDelete}
+            inputTodo={inputTodo}
+          />
+        )}
       </div>
     );
   }

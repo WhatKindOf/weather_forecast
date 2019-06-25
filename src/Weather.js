@@ -56,6 +56,7 @@ class Weather extends React.Component {
 
   render() {
     const data = this.props.data;
+    console.log(this.props);
     return (
       <Lower>
         <CurrentLocation>
@@ -76,7 +77,7 @@ class Weather extends React.Component {
           <WeatherImage>
             <Img
               src={require("./images/" + data.weatherInfo.weather + ".png")}
-              alt="sun"
+              alt={data.weatherInfo.weather}
             />
             <WhatIsWeather>{data.weatherInfo.weather}</WhatIsWeather>
           </WeatherImage>

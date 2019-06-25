@@ -1,63 +1,11 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { TextField } from "@material-ui/core";
-import update from "react-addons-update";
 
 class Todo extends React.Component {
-  state = {
-    TodoList: [],
-    id: 0
-  };
-
-  addTodo = e => {
-    if (e.key === "Enter") {
-      const text = e.target.value;
-      this.setState({
-        TodoList: [
-          ...this.state.TodoList,
-          {
-            id: this.state.id,
-            todo: text,
-            checkClick: "false",
-            deleteClick: "false"
-          }
-        ],
-        id: this.state.id + 1
-      });
-    }
-  };
-
-  clickCheckButton = id => {
-    if (this.state.TodoList[id].checkClick === "false") {
-      this.setState({
-        TodoList: update(this.state.TodoList, {
-          [id]: {
-            checkClick: { $set: "true" }
-          }
-        })
-      });
-    } else {
-      this.setState({
-        TodoList: update(this.state.TodoList, {
-          [id]: {
-            checkClick: { $set: "false" }
-          }
-        })
-      });
-    }
-  };
-
-  clickDeleteButton = id => {
-    this.setState({
-      TodoList: update(this.state.TodoList, {
-        [id]: {
-          deleteClick: { $set: "true" }
-        }
-      })
-    });
-  };
-
   render() {
+    const { todoList, clickCheck, clickDelete, inputTodo } = this.props;
+    console.log(this.props);
     return (
       <Lower>
         <InputSide>
@@ -65,30 +13,29 @@ class Todo extends React.Component {
             variant="outlined"
             helperText="할일을 작성해주세요."
             label="할일 추가"
-            onKeyPress={this.addTodo}
+            onKeyPress={e => {
+              if (e.key === "Enter") {
+                inputTodo(e.target.value);
+              }
+            }}
           />
         </InputSide>
         <TodoSide>
-          {this.state.TodoList === null
+          {todoList === null
             ? ""
-            : this.state.TodoList.map(t => {
+            : todoList.map(t => {
                 if (t.deleteClick !== "true") {
                   return (
-                    <TodoDiv
-                      key={t.id}
-                      check={this.state.TodoList[t.id].checkClick}
-                    >
+                    <TodoDiv key={t.id} check={todoList[t.id].checkClick}>
                       <TodoText>{t.todo}</TodoText>
                       <div>
                         <CheckButton
-                          check={this.state.TodoList[t.id].checkClick}
-                          onClick={() => this.clickCheckButton(t.id)}
+                          onClick={() => clickCheck(t.id)}
+                          check={todoList[t.id].checkClick}
                         >
                           <ButtonText>✔</ButtonText>
                         </CheckButton>
-                        <DeleteButton
-                          onClick={() => this.clickDeleteButton(t.id)}
-                        >
+                        <DeleteButton onClick={() => clickDelete(t.id)}>
                           <ButtonText>X</ButtonText>
                         </DeleteButton>
                       </div>
@@ -103,13 +50,15 @@ class Todo extends React.Component {
   }
 }
 
-function Bell() {
+function Bell({ count }) {
   return (
     <BellDiv>
       <Count>
-        <BellText>4</BellText>
+        <BellText>{count}</BellText>
       </Count>
-      <img src={require("./images/bell.png")} alt="bell" />
+      <BellButton>
+        <img src={require("./images/bell.png")} alt="bell" />
+      </BellButton>
     </BellDiv>
   );
 }
@@ -125,6 +74,12 @@ const Lower = styled.div`
   padding: 15px 0px;
 `;
 
+const BellButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+`;
+
 const BellDiv = styled.div`
   position: absolute;
   right: 20px;
@@ -132,7 +87,7 @@ const BellDiv = styled.div`
 
 const Count = styled.div`
   position: absolute;
-  margin-left: 11px;
+  margin-left: 16px;
   margin-top: -11px;
   background-color: purple;
   border-radius: 50%;
