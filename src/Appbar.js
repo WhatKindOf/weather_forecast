@@ -1,7 +1,8 @@
 import React from "react";
 import styled, { keyframes, css } from "styled-components";
 import Weather from "./Weather";
-import Todo, { Bell } from "./Todo";
+import Todo from "./Todo";
+import Calendar from "./Calendar";
 ///////////////// AppBar를 위한 import문 ///////////////////
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -76,7 +77,7 @@ class Appbar extends React.Component {
       humidity: "",
       windSpeed: ""
     },
-    show: false,
+    mode: "todo",
     showQuestion: "none"
   };
 
@@ -95,7 +96,7 @@ class Appbar extends React.Component {
                 humidity: res.main.humidity + "%",
                 windSpeed: res.wind.speed + "m/s"
               },
-              show: true
+              mode: "weather"
             })
           )
           .catch(err => console.log(err));
@@ -108,7 +109,7 @@ class Appbar extends React.Component {
 
   getWeather = async (lat, lon) => {
     const api_url =
-      "http://api.openweathermap.org/data/2.5/weather?lat=" +
+      "https://api.openweathermap.org/data/2.5/weather?lat=" +
       lat +
       "&lon=" +
       lon +
@@ -123,7 +124,7 @@ class Appbar extends React.Component {
   getCityWeather = async e => {
     const targetCity = e.target.value;
     const api_url =
-      "http://api.openweathermap.org/data/2.5/weather?q=" +
+      "https://api.openweathermap.org/data/2.5/weather?q=" +
       targetCity +
       "&appid=" +
       API_KEY;
@@ -140,12 +141,12 @@ class Appbar extends React.Component {
           humidity: body.main.humidity + "%",
           windSpeed: body.wind.speed + "m/s"
         },
-        show: true
+        mode: "weather"
       });
     }
   };
 
-  init = () => {
+  init = text => {
     this.setState({
       weatherInfo: {
         cityName: "",
@@ -156,7 +157,7 @@ class Appbar extends React.Component {
         humidity: "",
         windSpeed: ""
       },
-      show: false
+      mode: text
     });
   };
 
@@ -179,9 +180,10 @@ class Appbar extends React.Component {
       <div className={classes.root}>
         <AppBar className={classes.appBar} position="static">
           <Toolbar className={classes.toolBar}>
-            <HomeButton onClick={this.init}>
+            <HomeButton onClick={() => this.init("todo")}>
               <img src={require("./images/Home.png")} alt="HomeButton" />
             </HomeButton>
+            <CalendarIcon init={this.init} />
             <div>
               <img
                 src={require("./images/question.png")}
@@ -223,11 +225,13 @@ class Appbar extends React.Component {
               />
               <NoticeSentence>현재 위치 날씨</NoticeSentence>
             </Notice>
-            <Bell count={count} />
+            <Bell count={count} init={this.init} />
           </Toolbar>
         </AppBar>
-        {this.state.show === true ? (
+        {this.state.mode === "weather" ? (
           <Weather data={this.state} />
+        ) : this.state.mode === "insta" ? (
+          <Calendar />
         ) : (
           <Todo
             todoList={todoList}
@@ -241,9 +245,63 @@ class Appbar extends React.Component {
   }
 }
 
+function Bell({ count, init }) {
+  return (
+    <BellDiv>
+      <Count>
+        <BellText>{count}</BellText>
+      </Count>
+      <BellButton onClick={() => init("todo")}>
+        <img src={require("./images/bell.png")} alt="bell" />
+      </BellButton>
+    </BellDiv>
+  );
+}
+
+function CalendarIcon({ init }) {
+  return (
+    <CalendarButton onClick={() => init("insta")}>
+      <img src={require("./images/calendar.png")} alt="calendar" />
+    </CalendarButton>
+  );
+}
+
+const CalendarButton = styled.div`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-right: 15px;
+`;
+
+const BellButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+`;
+
+const BellDiv = styled.div`
+  margin-left: 60px;
+`;
+const Count = styled.div`
+  position: absolute;
+  margin-left: 16px;
+  margin-top: -11px;
+  background-color: purple;
+  border-radius: 50%;
+  padding: 1px 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 10px 10px 30px #000808;
+`;
+
+const BellText = styled.span`
+  font-size: 15px;
+`;
+
 const HomeButton = styled.button`
   background-color: transparent;
-  margin-right: 15px;
+  margin-right: 60px;
   border: none;
   cursor: pointer;
 `;
@@ -251,7 +309,7 @@ const HomeButton = styled.button`
 const HereButton = styled.button`
   background-color: transparent;
   margin-left: 20px;
-  margin-right: 25px;
+  margin-right: 10px;
   border: none;
   cursor: pointer;
 `;

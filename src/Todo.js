@@ -5,7 +5,6 @@ import { TextField } from "@material-ui/core";
 class Todo extends React.Component {
   render() {
     const { todoList, clickCheck, clickDelete, inputTodo } = this.props;
-    console.log(this.props);
     return (
       <Lower>
         <InputSide>
@@ -50,19 +49,6 @@ class Todo extends React.Component {
   }
 }
 
-function Bell({ count }) {
-  return (
-    <BellDiv>
-      <Count>
-        <BellText>{count}</BellText>
-      </Count>
-      <BellButton>
-        <img src={require("./images/bell.png")} alt="bell" />
-      </BellButton>
-    </BellDiv>
-  );
-}
-
 const Lower = styled.div`
   position: absolute;
   height: 90%;
@@ -72,30 +58,6 @@ const Lower = styled.div`
   justify-content: center;
   align-items: center;
   padding: 15px 0px;
-`;
-
-const BellButton = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-`;
-
-const BellDiv = styled.div`
-  position: absolute;
-  right: 20px;
-`;
-
-const Count = styled.div`
-  position: absolute;
-  margin-left: 16px;
-  margin-top: -11px;
-  background-color: purple;
-  border-radius: 50%;
-  padding: 1px 7px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 10px 10px 30px #000808;
 `;
 
 const CheckButton = styled.button`
@@ -152,10 +114,6 @@ const TodoDiv = styled.div`
   margin-bottom: 10px;
 `;
 
-const BellText = styled.span`
-  font-size: 15px;
-`;
-
 const TodoText = styled.span`
   font-weight: bold;
   margin-left: 10px;
@@ -190,7 +148,5 @@ const TodoSide = styled.div`
     display: none !important;
   }
 `;
-
-export { Bell };
 
 export default Todo;
