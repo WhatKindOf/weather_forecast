@@ -56,7 +56,6 @@ class Weather extends React.Component {
 
   render() {
     const data = this.props.data;
-    console.log(this.props);
     return (
       <Lower>
         <CurrentLocation>

@@ -7,6 +7,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { withStyles } from "@material-ui/core/styles";
+import LinesEllipsis from "react-lines-ellipsis";
 
 const styles = theme => ({
   center: {
@@ -18,6 +19,16 @@ const styles = theme => ({
     display: "flex",
     justifyContent: "space-around",
     alignItems: "center"
+  },
+  column: {
+    display: "flex",
+    flexDirection: "column"
+  },
+  buttons: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 15
   }
 });
 
@@ -29,7 +40,9 @@ class Calendar extends React.Component {
     open: false,
     schedule: "",
     startDate: "",
-    endDate: ""
+    importance: "default",
+    storage: [],
+    showScheduleList: false
   };
 
   getDate = () => {
@@ -39,11 +52,6 @@ class Calendar extends React.Component {
       currentMonth: date.getMonth() + 1
     });
   };
-
-  componentDidMount() {
-    this.getDate();
-    this.showWeek();
-  }
 
   showDialog = tmp => {
     this.setState({
@@ -56,38 +64,88 @@ class Calendar extends React.Component {
     this.setState({
       schedule: "",
       startDate: "",
-      endDate: "",
       open: false
     });
   };
 
   handleFormSubmit = e => {
     e.preventDefault();
-    if (
-      this.state.schedule !== "" &&
-      this.state.startDate !== "" &&
-      this.state.endDate !== ""
-    ) {
+    if (this.state.schedule !== "") {
       const scheduleObj = {
         schedule: this.state.schedule,
         startDate: this.state.startDate,
-        endDate: this.state.endDate
+        importance: this.state.importance
       };
-      localStorage.setItem("Schedule_LS", JSON.stringify(scheduleObj));
+      const storage = this.state.storage;
+      storage.push(scheduleObj);
+      localStorage.setItem("Schedule_LS", JSON.stringify(storage));
 
       this.setState({
         schedule: "",
         startDate: "",
-        endDate: "",
-        open: false
+        open: false,
+        storage: storage,
+        importance: "default"
       });
+
+      this.showWeek();
     }
+  };
+
+  deleteSchedule = async (startDate, schedule) => {
+    const storage = this.state.storage;
+    const newStorage = storage.filter(s => {
+      return s.schedule !== schedule || s.startDate !== startDate;
+    });
+    await this.setState({
+      storage: newStorage
+    });
+    localStorage.setItem("Schedule_LS", JSON.stringify(this.state.storage));
+
+    console.log(this.state.storage);
+    this.closeList();
+    this.showWeek();
   };
 
   handleValueChange = e => {
     let nextState = {};
     nextState[e.target.name] = e.target.value;
     this.setState(nextState);
+  };
+
+  chooseColor = color => {
+    if (this.state.importance === color) {
+      this.setState({
+        importance: "default"
+      });
+    } else {
+      this.setState({
+        importance: color
+      });
+    }
+  };
+
+  loadStorage = () => {
+    const load = localStorage.getItem("Schedule_LS");
+    if (load !== null) {
+      const parsedLoad = JSON.parse(load);
+      this.setState({
+        storage: parsedLoad
+      });
+    }
+  };
+
+  showList = tmp => {
+    this.setState({
+      startDate: tmp,
+      showScheduleList: true
+    });
+  };
+
+  closeList = () => {
+    this.setState({
+      showScheduleList: false
+    });
   };
 
   showWeek = () => {
@@ -101,31 +159,81 @@ class Calendar extends React.Component {
     let cnt = 0;
     let week = [];
 
+    const storage = this.state.storage;
+
+    storage.sort(function(a, b) {
+      return a["startDate"] - b["startDate"];
+    });
+
     for (let i = 0; i < rows; i++) {
       let day = [];
 
       for (let j = 0; j < 7; j++) {
         let tmp = cnt - first + 1;
+        const draw = storage.filter(s => {
+          return tmp === s.startDate;
+        });
+
         day.push(
-          <DayDiv>
+          <DayDiv key={tmp}>
             <TmpSpan day={j}>{tmp > 0 && tmp <= last ? tmp : ""}</TmpSpan>
-            <AddButton onClick={() => this.showDialog(tmp)}>
-              {tmp > 0 && tmp <= last ? (
-                <img src={require("./images/add.png")} alt="add" />
-              ) : (
-                ""
-              )}
-            </AddButton>
+            <ScheduleContainer>
+              {draw !== null
+                ? draw.map(d => {
+                    return (
+                      <ScheduleDiv key={tmp + 500} color={d.importance}>
+                        <LinesEllipsis
+                          text={d.schedule}
+                          maxLine="1"
+                          ellipsis="..."
+                          trimRight
+                          basedOn="letters"
+                        />
+                      </ScheduleDiv>
+                    );
+                  })
+                : ""}
+            </ScheduleContainer>
+            <Between>
+              <ImgButton onClick={() => this.showList(tmp)}>
+                {tmp > 0 && tmp <= last ? (
+                  <img src={require("./images/list.png")} alt="list" />
+                ) : (
+                  ""
+                )}
+              </ImgButton>
+              <ImgButton onClick={() => this.showDialog(tmp)}>
+                {tmp > 0 && tmp <= last ? (
+                  <img src={require("./images/add.png")} alt="add" />
+                ) : (
+                  ""
+                )}
+              </ImgButton>
+            </Between>
           </DayDiv>
         );
         cnt = cnt + 1;
       }
-      week.push(<WeekDiv rows={rows}>{day}</WeekDiv>);
+      week.push(
+        <WeekDiv key={cnt} rows={rows}>
+          {day}
+        </WeekDiv>
+      );
     }
+
     this.setState({
       week
     });
   };
+
+  componentWillMount() {
+    this.loadStorage();
+  }
+
+  componentDidMount() {
+    this.getDate();
+    this.showWeek();
+  }
 
   render() {
     const { classes } = this.props;
@@ -163,7 +271,7 @@ class Calendar extends React.Component {
           </DayOfWeekDiv>
           <CalendarDiv>{this.state.week ? this.state.week : ""}</CalendarDiv>
         </Container>
-        <Dialog open={this.state.open} onClose={this.closeDialog}>
+        <Dialog open={this.state.open}>
           <DialogTitle className={classes.center}>일정 추가</DialogTitle>
           <DialogContent>
             <TextField
@@ -171,34 +279,46 @@ class Calendar extends React.Component {
               label="일정"
               type="text"
               name="schedule"
-              required="true"
               value={this.state.schedule}
               onChange={this.handleValueChange}
             />
             <br />
             <br />
-            <TextField
-              variant="outlined"
-              label="시작일"
-              type="text"
-              placeholder="DD"
-              name="startDate"
-              required="true"
-              value={this.state.startDate}
-              onChange={this.handleValueChange}
-            />
-            <br />
-            <br />
-            <TextField
-              variant="outlined"
-              label="종료일"
-              type="text"
-              placeholder="DD"
-              name="endDate"
-              required="true"
-              value={this.state.endDate}
-              onChange={this.handleValueChange}
-            />
+            <div className={classes.column}>
+              <span>중요도</span>
+              <div className={classes.buttons}>
+                <ImportanceButton
+                  color="lightgreen"
+                  onClick={() => this.chooseColor("lightgreen")}
+                >
+                  <MarkImg
+                    color="lightgreen"
+                    importance={this.state.importance}
+                    src={require("./images/mark.png")}
+                  />
+                </ImportanceButton>
+                <ImportanceButton
+                  color="orange"
+                  onClick={() => this.chooseColor("orange")}
+                >
+                  <MarkImg
+                    color="orange"
+                    importance={this.state.importance}
+                    src={require("./images/mark.png")}
+                  />
+                </ImportanceButton>
+                <ImportanceButton
+                  color="red"
+                  onClick={() => this.chooseColor("red")}
+                >
+                  <MarkImg
+                    color="red"
+                    importance={this.state.importance}
+                    src={require("./images/mark.png")}
+                  />
+                </ImportanceButton>
+              </div>
+            </div>
           </DialogContent>
           <DialogActions className={classes.between}>
             <Button
@@ -206,21 +326,128 @@ class Calendar extends React.Component {
               color="primary"
               onClick={this.handleFormSubmit}
             >
-              일정 저장
+              추가
             </Button>
             <Button
               variant="contained"
               color="primary"
               onClick={this.closeDialog}
             >
-              닫기
+              취소
             </Button>
           </DialogActions>
+        </Dialog>
+
+        <Dialog open={this.state.showScheduleList} onClose={this.closeList}>
+          <DialogTitle className={classes.center}>일정 리스트</DialogTitle>
+          <DialogContent className={classes.column}>
+            {this.state.storage.map(s => {
+              if (s.startDate === this.state.startDate) {
+                return (
+                  <div className={classes.buttons}>
+                    <EachSchedule color={s.importance}>
+                      {s.schedule}
+                    </EachSchedule>
+                    <ImgButton
+                      onClick={() =>
+                        this.deleteSchedule(s.startDate, s.schedule)
+                      }
+                    >
+                      <img src={require("./images/delete.png")} alt="delete" />
+                    </ImgButton>
+                  </div>
+                );
+              }
+            })}
+          </DialogContent>
         </Dialog>
       </Div>
     );
   }
 }
+
+const EachSchedule = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 7px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  margin-right: 15px;
+  ${props => {
+    return css`
+      background-color: ${props.color};
+      box-shadow: 2px 2px 2px 2px #808080;
+    `;
+  }}
+`;
+
+const Between = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ImgButton = styled.button`
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+`;
+
+const ScheduleContainer = styled.div`
+  width: 100%;
+  height: 75%;
+  overflow: hidden;
+`;
+
+const ScheduleDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 26%;
+  border-radius: 5px;
+  margin-bottom: 6px;
+  ${props => {
+    if (props.color === "default") {
+      return css`
+        background-color: white;
+      `;
+    } else {
+      return css`
+        background-color: ${props.color};
+      `;
+    }
+  }}
+`;
+
+const MarkImg = styled.img`
+  display: none;
+  ${props => {
+    if (props.importance === props.color) {
+      return css`
+        display: block;
+      `;
+    }
+  }}
+`;
+
+const ImportanceButton = styled.button`
+  border-radius: 10px;
+  height: 58px;
+  width: 58px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  ${props => {
+    return css`
+      background-color: ${props.color};
+    `;
+  }}
+`;
 
 const DaySpan = styled.span`
   font-weight: bold;
@@ -296,14 +523,6 @@ const DateSpan = styled.span`
   width: 50%;
 `;
 
-const TodayButton = styled.button`
-  border-radius: 5px;
-  background-color: white;
-  height: 100%;
-  padding: auto 8px;
-  cursor: pointer;
-`;
-
 const TitleDiv = styled.div`
   height: 5%;
   width: 100%;
@@ -331,12 +550,6 @@ const DayDiv = styled.div`
   justify-content: space-between;
   align-items: flex-end;
   border: 1px solid #e2e2e2;
-`;
-
-const AddButton = styled.button`
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
 `;
 
 const Container = styled.div`

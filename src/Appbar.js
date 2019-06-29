@@ -230,7 +230,7 @@ class Appbar extends React.Component {
         </AppBar>
         {this.state.mode === "weather" ? (
           <Weather data={this.state} />
-        ) : this.state.mode === "insta" ? (
+        ) : this.state.mode === "calendar" ? (
           <Calendar />
         ) : (
           <Todo
@@ -260,7 +260,7 @@ function Bell({ count, init }) {
 
 function CalendarIcon({ init }) {
   return (
-    <CalendarButton onClick={() => init("insta")}>
+    <CalendarButton onClick={() => init("calendar")}>
       <img src={require("./images/calendar.png")} alt="calendar" />
     </CalendarButton>
   );
