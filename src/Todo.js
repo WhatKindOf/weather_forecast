@@ -15,6 +15,7 @@ class Todo extends React.Component {
             onKeyPress={e => {
               if (e.key === "Enter") {
                 inputTodo(e.target.value);
+                e.target.value="";
               }
             }}
           />
