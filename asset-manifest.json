@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/weather_forecast/static/css/main.b63d82e1.chunk.css",
-    "main.js": "/weather_forecast/static/js/main.fc86e8a4.chunk.js",
-    "main.js.map": "/weather_forecast/static/js/main.fc86e8a4.chunk.js.map",
+    "main.js": "/weather_forecast/static/js/main.3c8eda91.chunk.js",
+    "main.js.map": "/weather_forecast/static/js/main.3c8eda91.chunk.js.map",
     "runtime~main.js": "/weather_forecast/static/js/runtime~main.0ad8bc9d.js",
     "runtime~main.js.map": "/weather_forecast/static/js/runtime~main.0ad8bc9d.js.map",
-    "static/js/2.a67303b4.chunk.js": "/weather_forecast/static/js/2.a67303b4.chunk.js",
-    "static/js/2.a67303b4.chunk.js.map": "/weather_forecast/static/js/2.a67303b4.chunk.js.map",
+    "static/js/2.718e18b8.chunk.js": "/weather_forecast/static/js/2.718e18b8.chunk.js",
+    "static/js/2.718e18b8.chunk.js.map": "/weather_forecast/static/js/2.718e18b8.chunk.js.map",
     "index.html": "/weather_forecast/index.html",
-    "precache-manifest.7a5a700face6c883ddb8b69c21497140.js": "/weather_forecast/precache-manifest.7a5a700face6c883ddb8b69c21497140.js",
+    "precache-manifest.31762826ad8583e045a15a08a0fa1c0a.js": "/weather_forecast/precache-manifest.31762826ad8583e045a15a08a0fa1c0a.js",
     "service-worker.js": "/weather_forecast/service-worker.js",
     "static/css/main.b63d82e1.chunk.css.map": "/weather_forecast/static/css/main.b63d82e1.chunk.css.map",
     "static/media/Clear.png": "/weather_forecast/static/media/Clear.fa6647d0.png",
@@ -18,12 +18,6 @@
     "static/media/Mist.png": "/weather_forecast/static/media/Mist.722e3bfb.png",
     "static/media/Rain.png": "/weather_forecast/static/media/Rain.57e92b24.png",
     "static/media/Snow.png": "/weather_forecast/static/media/Snow.ae7f4573.png",
-    "static/media/Thunderstorm.png": "/weather_forecast/static/media/Thunderstorm.e1831bb2.png",
-    "static/media/first.png": "/weather_forecast/static/media/first.521039ac.png",
-    "static/media/fourth.png": "/weather_forecast/static/media/fourth.975191ca.png",
-    "static/media/profile.png": "/weather_forecast/static/media/profile.5aea5ff4.png",
-    "static/media/profiles.png": "/weather_forecast/static/media/profiles.768f82d9.png",
-    "static/media/second.png": "/weather_forecast/static/media/second.55a2d150.png",
-    "static/media/third.png": "/weather_forecast/static/media/third.d2eff1f2.png"
+    "static/media/Thunderstorm.png": "/weather_forecast/static/media/Thunderstorm.e1831bb2.png"
   }
 }
