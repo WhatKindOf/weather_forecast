@@ -12,7 +12,7 @@ Redux : Todo-list에서 활용되었습니다.
 # 2. 기능 설명
 ## 2-1. 날씨 조회
 ### 2-1-1. 현재 위치 날씨 조회
-![currentPositionWeather](./image/currentPositionWeather.png)
+![currentPositionWeather](./image/currentPositionWeather.PNG)
 ### 2-1-2. 검색한 도시의 날씨 조회
 
 ## 2-2. Todo-list
