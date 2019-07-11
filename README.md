@@ -47,3 +47,7 @@ TextField 할일을 작성하고 'Enter' 키를 클릭하면, 바로 아래에 �
 ### 2-3-3. 일정 삭제
 ![RemoveCalendar](./image/RemoveCalendar.PNG)<br>
 삭제 버튼을 클릭하면, 해당 날짜에서 해당 일정이 삭제됩니다.
+
+# 3. 동작 확인
+## 실제 동작은 다음 URL에서 확인 가능합니다.
+### https://whatkindof.github.io/weather_forecast/
